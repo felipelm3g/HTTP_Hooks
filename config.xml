@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <name>HTTP_Hooks</name>
+    <displayName>HTTP Hooks</displayName>
+    <version>1.0.0</version>
+    <author>LDE Sistemas</author>
+    <tab>administration</tab>
+    <description>Faz requisições HTTP nos eventos do PrestaShop.</description>
+    <confirmUninstall>Tem certeza de que deseja desinstalar?</confirmUninstall>
+    <ps_versions_compliancy>
+        <min>1.7.6</min>
+        <max>1.7.99</max>
+    </ps_versions_compliancy>
+    <autoload>
+        <files>
+            <file>HTTP_Hooks.php</file>
+        </files>
+    </autoload>
+</module>
