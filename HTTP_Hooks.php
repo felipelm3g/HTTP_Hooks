@@ -4,19 +4,17 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-class HTTP_Hooks extends Module
-{
+class HTTP_Hooks extends Module {
 
     private $apiKey;
     private $apiUrl;
     private $logFile;
     private $eventPaths;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->name = 'HTTP_Hooks';
         $this->tab = 'administration';
-        $this->version = '1.0.1';
+        $this->version = '1.0.0';
         $this->author = 'FelipeLm3g';
         $this->need_instance = 0;
 
@@ -33,59 +31,23 @@ class HTTP_Hooks extends Module
         $this->logFile = _PS_MODULE_DIR_ . 'HTTP_Hooks/logs/hook_logs.txt';
     }
 
-    public function install()
-    {
-
-        // Limpa o cache antes de instalar
-        $this->clearCache();
-
+    public function install() {
         return parent::install() && $this->registerHook([
-            'actionProductAdd',
-            'actionProductUpdate',
-            'actionProductDelete',
-            'actionValidateOrder',
-            'actionOrderStatusUpdate',
-            'actionCartSave',
-            'actionBeforeCartUpdateQty',
-            'actionCustomerAccountAdd',
-            'actionCustomerLoginAfter',
-            'actionCustomerLogoutAfter',
-            'actionPaymentConfirmation'
-        ]) && $this->addConfiguration();
+                    'actionProductAdd',
+                    'actionProductUpdate',
+                    'actionProductDelete',
+                    'actionValidateOrder',
+                    'actionOrderStatusUpdate',
+                    'actionCartSave',
+                    'actionBeforeCartUpdateQty',
+                    'actionCustomerAccountAdd',
+                    'actionCustomerLoginAfter',
+                    'actionCustomerLogoutAfter',
+                    'actionPaymentConfirmation'
+                ]) && $this->addConfiguration();
     }
 
-    private function clearCache()
-    {
-        $cacheDirs = [
-            _PS_ROOT_DIR_ . '/var/cache/prod/',
-            _PS_ROOT_DIR_ . '/var/cache/dev/'
-        ];
-
-        foreach ($cacheDirs as $dir) {
-            if (is_dir($dir)) {
-                $this->deleteDir($dir);
-            }
-        }
-    }
-
-    private function deleteDir($dirPath)
-    {
-        if (!is_dir($dirPath)) {
-            return;
-        }
-
-        foreach (scandir($dirPath) as $file) {
-            if ($file !== '.' && $file !== '..') {
-                $filePath = $dirPath . DIRECTORY_SEPARATOR . $file;
-                is_dir($filePath) ? $this->deleteDir($filePath) : unlink($filePath);
-            }
-        }
-
-        rmdir($dirPath);
-    }
-
-    public function uninstall()
-    {
+    public function uninstall() {
         // Remove as configurações ao desinstalar
         Configuration::deleteByName('HTTP_HOOKS_API_KEY');
         Configuration::deleteByName('HTTP_HOOKS_API_URL');
@@ -94,8 +56,7 @@ class HTTP_Hooks extends Module
         return parent::uninstall();
     }
 
-    public function getContent()
-    {
+    public function getContent() {
         // Exibe o formulário de configuração
         if (Tools::isSubmit('submit_' . $this->name)) {
             $this->saveConfig();
@@ -104,8 +65,7 @@ class HTTP_Hooks extends Module
         return $this->displayForm();
     }
 
-    private function displayForm()
-    {
+    private function displayForm() {
         $fields_form = [
             'form' => [
                 'legend' => [
@@ -222,7 +182,7 @@ class HTTP_Hooks extends Module
                         'required' => false,
                         'value' => isset($this->eventPaths['actionPaymentFailure']) ? $this->eventPaths['actionPaymentFailure'] : 'payment/failure'
                     ],
-                    // Adicione mais campos para outros eventos conforme necessário
+                // Adicione mais campos para outros eventos conforme necessário
                 ],
                 'submit' => [
                     'title' => $this->l('Salvar'),
@@ -246,8 +206,7 @@ class HTTP_Hooks extends Module
         return $helper->generateForm([$fields_form]);
     }
 
-    private function saveConfig()
-    {
+    private function saveConfig() {
         $apiKey = Tools::getValue('HTTP_HOOKS_API_KEY');
         $apiUrl = Tools::getValue('HTTP_HOOKS_API_URL');
 
@@ -285,8 +244,7 @@ class HTTP_Hooks extends Module
     }
 
     // Método para enviar requisições HTTP
-    private function sendRequestHTTP($eventName, $params)
-    {
+    private function sendRequestHTTP($eventName, $params) {
 
         if (empty($this->apiKey) || empty($this->apiUrl)) {
             // Não faz a requisição se a URL ou chave da API estiverem vazias
@@ -338,76 +296,63 @@ class HTTP_Hooks extends Module
     }
 
     // Hook de eventos para capturar ações de clientes, pedidos, produtos, etc.
-    public function hookActionProductAdd($params)
-    {
+    public function hookActionProductAdd($params) {
         $this->sendRequestHTTP('produto/adicionado', $params);
     }
 
-    public function hookActionProductUpdate($params)
-    {
+    public function hookActionProductUpdate($params) {
         $this->sendRequestHTTP('produto/atualizado', $params);
     }
 
-    public function hookActionProductDelete($params)
-    {
+    public function hookActionProductDelete($params) {
         $this->sendRequestHTTP('produto/excluido', $params);
     }
 
-    public function hookActionValidateOrder($params)
-    {
+    public function hookActionValidateOrder($params) {
         $this->sendRequestHTTP('pedido/validado', $params);
     }
 
-    public function hookActionOrderStatusUpdate($params)
-    {
+    public function hookActionOrderStatusUpdate($params) {
         $this->sendRequestHTTP('pedido/status', $params);
     }
 
-    public function hookActionCartSave($params)
-    {
+    public function hookActionCartSave($params) {
         $this->sendRequestHTTP('carrinho/salvo', $params);
     }
 
-    public function hookActionBeforeCartUpdateQty($params)
-    {
+    public function hookActionBeforeCartUpdateQty($params) {
         $this->sendRequestHTTP('carrinho/atualizacao', $params);
     }
 
-    public function hookActionCustomerAccountAdd($params)
-    {
+    public function hookActionCustomerAccountAdd($params) {
         $this->sendRequestHTTP('cliente/novo', $params);
     }
 
-    public function hookActionCustomerLoginAfter($params)
-    {
+    public function hookActionCustomerLoginAfter($params) {
         $this->sendRequestHTTP('cliente/login', $params);
     }
 
-    public function hookActionCustomerLogoutAfter($params)
-    {
+    public function hookActionCustomerLogoutAfter($params) {
         $this->sendRequestHTTP('cliente/logout', $params);
     }
 
-    public function hookActionPaymentConfirmation($params)
-    {
+    public function hookActionPaymentConfirmation($params) {
         $this->sendRequestHTTP('pagamento/confirmado', $params);
     }
 
-    private function logErroRequest($eventName, $payload, $response, $httpCode)
-    {
+    private function logErroRequest($eventName, $payload, $response, $httpCode) {
         $logMessage = sprintf(
-            "[%s] - Evento: %s - Status: %d - Resposta: %s - Payload: %s\n",
-            date('Y-m-d H:i:s'),
-            $eventName,
-            $httpCode,
-            $response,
-            $payload
+                "[%s] - Evento: %s - Status: %d - Resposta: %s - Payload: %s\n",
+                date('Y-m-d H:i:s'),
+                $eventName,
+                $httpCode,
+                $response,
+                $payload
         );
         file_put_contents($this->logFile, $logMessage, FILE_APPEND);
     }
 
-    private function addConfiguration()
-    {
+    private function addConfiguration() {
         // Verifica se as configurações estão definidas, caso contrário, define valores padrões
         if (!Configuration::get('HTTP_HOOKS_API_KEY')) {
             Configuration::updateValue('HTTP_HOOKS_API_KEY', 'SUA_CHAVE_API');
