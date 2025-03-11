@@ -7,7 +7,7 @@ Este módulo permite fazer requisições HTTP a uma API externa em vários event
 
 Você pode fazer o download da versão mais recente do módulo clicando no link abaixo:
 
-- [Versão 1.0.0](https://github.com/felipelm3g/HTTP_Hooks/raw/main/versions/HTTP_Hooks_1.0.0.zip)
+- [Versão 1.0.0](https://github.com/felipelm3g/HTTP_Hooks/raw/main/versions/HTTP_Hooks_1.0.1.zip)
 
 ## 🛠️ Instalação
 
