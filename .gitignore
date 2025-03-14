@@ -171,3 +171,4 @@ themes/default-bootstrap/modules/*/mails/*
 /vendor/
 /web/bundles/
 
+/nbproject/private/
